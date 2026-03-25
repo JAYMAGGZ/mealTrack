@@ -9,21 +9,25 @@ class MealSlot extends Model
 {
     protected $fillable = [
         'meal_type',
-        'date',
-        'booking_cutoff',
-        'serving_start',
-        'serving_end',
-        'max_capacity',
-        'is_active',
+    'date',
+    'booking_cutoff',
+    'late_booking_cutoff',
+    'late_booking_credit_cost',
+    'serving_start',
+    'serving_end',
+    'max_capacity',
+    'is_active',
     ];
 
     protected $casts = [
-        'date'           => 'date',
-        'booking_cutoff' => 'datetime',
-        'serving_start'  => 'datetime',
-        'serving_end'    => 'datetime',
-        'is_active'      => 'boolean',
-        'max_capacity'   => 'integer',
+        'date'                     => 'date',
+    'booking_cutoff'           => 'datetime',
+    'late_booking_cutoff'      => 'datetime',
+    'serving_start'            => 'datetime',
+    'serving_end'              => 'datetime',
+    'is_active'                => 'boolean',
+    'max_capacity'             => 'integer',
+    'late_booking_credit_cost' => 'integer',,
     ];
 
     public function menu(): HasMany
@@ -65,4 +69,11 @@ class MealSlot extends Model
     {
         return $query->where('is_active', true);
     }
+
+    public function getIsLateWindowOpenAttribute(): bool
+{
+    return $this->late_booking_cutoff &&
+           now()->isAfter($this->booking_cutoff) &&
+           now()->isBefore($this->late_booking_cutoff);
+}
 }

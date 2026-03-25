@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * @mixin \Laravel\Sanctum\HasApiTokens
+ * @method \Laravel\Sanctum\NewAccessToken createToken(string $name, array $abilities = ['*'], \DateTimeInterface|\DateInterval|int|null $expiresAt = null)
+ */
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory;

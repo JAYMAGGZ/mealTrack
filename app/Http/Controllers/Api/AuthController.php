@@ -27,7 +27,14 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $user  = Auth::user();
+        $user = Auth::user();
+
+        if (!$user instanceof User) {
+            return response()->json([
+                'message' => 'Authenticated user not found',
+            ], 401);
+        }
+
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([

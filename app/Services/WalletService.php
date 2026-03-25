@@ -33,29 +33,28 @@ class WalletService
      * Called when a resident books a meal
      * Moves 1 credit from spendable → reserved
      */
-    public function reserveCredit(User $user, int $bookingId): void
-    {
-        DB::transaction(function () use ($user, $bookingId) {
-            $wallet = $user->wallet;
+    public function reserveCredit(User $user, int $bookingId, int $amount = 1): void
+{
+    DB::transaction(function () use ($user, $bookingId, $amount) {
+        $wallet = $user->wallet;
 
-            // Guard: should never happen — BookingService checks first
-            if ($wallet->balance < 1) {
-                throw new Exception('Insufficient balance to reserve credit.');
-            }
+        if ($wallet->balance < $amount) {
+            throw new Exception('Insufficient balance to reserve credit.');
+        }
 
-            $wallet->decrement('balance', 1);
-            $wallet->increment('reserved_balance', 1);
+        $wallet->decrement('balance', $amount);
+        $wallet->increment('reserved_balance', $amount);
 
-            CreditTransaction::create([
-                'user_id'       => $user->id,
-                'booking_id'    => $bookingId,
-                'type'          => 'reserve',
-                'amount'        => 1,
-                'balance_after' => $wallet->fresh()->balance,
-                'notes'         => 'Credit reserved for booking #' . $bookingId,
-            ]);
-        });
-    }
+        CreditTransaction::create([
+            'user_id'       => $user->id,
+            'booking_id'    => $bookingId,
+            'type'          => 'reserve',
+            'amount'        => $amount,
+            'balance_after' => $wallet->fresh()->balance,
+            'notes'         => 'Credit reserved for booking #' . $bookingId,
+        ]);
+    });
+}
 
     /**
      * Called when resident checks in OR is marked no-show

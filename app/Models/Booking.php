@@ -10,13 +10,18 @@ class Booking extends Model
 {
     protected $fillable = [
         'user_id',
-        'meal_slot_id',
-        'status',
-        'checked_in_at',
+    'booked_by_user_id',
+    'meal_slot_id',
+    'status',
+    'is_late_booking',
+    'is_proxy_booking',
+    'checked_in_at'
     ];
 
     protected $casts = [
-        'checked_in_at' => 'datetime',
+        'checked_in_at'    => 'datetime',
+    'is_late_booking'  => 'boolean',
+    'is_proxy_booking' => 'boolean',
     ];
 
     public function user(): BelongsTo
