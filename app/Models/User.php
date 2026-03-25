@@ -33,6 +33,16 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    protected static function booted(): void
+    {
+        static::created(function (User $user) {
+            $user->wallet()->create([
+                'balance'          => 0,
+                'reserved_balance' => 0,
+            ]);
+        });
+    }
+
     public function wallet(): HasOne
     {
         return $this->hasOne(CreditWallet::class);
