@@ -27,7 +27,7 @@ class MealSlot extends Model
     'serving_end'              => 'datetime',
     'is_active'                => 'boolean',
     'max_capacity'             => 'integer',
-    'late_booking_credit_cost' => 'integer',,
+    'late_booking_credit_cost' => 'integer',
     ];
 
     public function menu(): HasMany
