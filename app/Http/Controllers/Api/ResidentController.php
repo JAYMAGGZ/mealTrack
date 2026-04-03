@@ -277,4 +277,14 @@ class ResidentController extends Controller
         ], $e->getCode() ?: 422);
     }
 }
+public function saveDeviceToken(Request $request): JsonResponse
+{
+    $request->validate([
+        'token' => 'required|string',
+    ]);
+
+    $request->user()->update(['fcm_token' => $request->token]);
+
+    return response()->json(['message' => 'Device token saved.']);
+}
 }

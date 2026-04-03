@@ -13,3 +13,4 @@ Route::get('/qr',                    [ResidentController::class, 'qr']);
 Route::post('/self-checkin',         [ResidentController::class, 'selfCheckIn']);
 Route::post('/rate',                 [ResidentController::class, 'rate']);
 Route::post('/book-for-friend', [ResidentController::class, 'bookForFriend']);
+Route::post('/device-token', [ResidentController::class, 'saveDeviceToken']);

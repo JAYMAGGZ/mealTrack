@@ -48,7 +48,7 @@ class BookingService
             throw new Exception('You have already booked this meal slot.', 409);
         }
 
-        return DB::transaction(function () use ($user, $slot, $creditCost) {
+        $booking = DB::transaction(function () use ($user, $slot, $creditCost) {
             $booking = Booking::create([
                 'user_id'         => $user->id,
                 'meal_slot_id'    => $slot->id,
@@ -60,6 +60,14 @@ class BookingService
 
             return $booking;
         });
+
+        app(NotificationService::class)->sendToUser(
+            $user,
+            'Meal booked!',
+            "Your {$slot->meal_type} on {$slot->date->format('D d M')} is confirmed."
+        );
+
+        return $booking;
     }
 
     public function bookForFriend(User $proxy, User $friend, MealSlot $slot): Booking
@@ -138,6 +146,7 @@ class BookingService
 
     public function processNoShows(): int
     {
+        /** @var \Illuminate\Database\Eloquent\Collection<int, Booking> $overdueBookings */
         $overdueBookings = Booking::where('status', 'pending')
             ->whereHas('mealSlot', function ($query) {
                 // Only process after BOTH cutoffs have passed
@@ -153,6 +162,7 @@ class BookingService
         $processed = 0;
 
         foreach ($overdueBookings as $booking) {
+            /** @var Booking $booking */
             DB::transaction(function () use ($booking) {
                 $booking->update(['status' => 'no_show']);
 
@@ -162,6 +172,12 @@ class BookingService
                     'No-show: ' . $booking->mealSlot->meal_type . ' on ' . $booking->mealSlot->date
                 );
             });
+
+            app(NotificationService::class)->sendToUser(
+                $booking->user,
+                'Missed meal',
+                "You missed your {$booking->mealSlot->meal_type}. 1 credit was deducted."
+            );
 
             $processed++;
         }
